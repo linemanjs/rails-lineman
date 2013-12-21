@@ -13,6 +13,7 @@ module RailsLineman
     def build
       absolutify_lineman_path
       chdir @lineman_project_location do
+        install_node_js_on_heroku
         run_npm_install
         run_lineman_build
       end
@@ -50,6 +51,25 @@ module RailsLineman
       Dir.chdir(path)
       yield
       Dir.chdir(og_dir)
+    end
+
+    def install_node_js_on_heroku
+      if heroku?
+        puts "It looks like we're on heroku, so let's install Node.js"
+        system <<-BASH
+          node_version=$(curl --silent --get https://semver.io/node/resolve)
+          node_url="http://s3pository.heroku.com/node/v$node_version/node-v$node_version-linux-x64.tar.gz"
+          echo $node_url
+          curl "$node_url" -s -o - | tar xzf - -C .
+          chmod +x node-v$node_version-linux-x64/bin/*
+          export PATH="$PATH:$(pwd)/node-v$node_version-linux-x64/bin"
+          echo $PATH
+        BASH
+      end
+    end
+
+    def heroku?
+      ENV['DYNO']
     end
 
     def run_npm_install
