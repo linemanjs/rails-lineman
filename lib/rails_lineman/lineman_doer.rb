@@ -16,6 +16,7 @@ module RailsLineman
         install_node_js_on_heroku
         run_npm_install
         run_lineman_build
+        delete_node_js_from_heroku
       end
       copy_javascripts
       add_javascripts_to_precompile_list
@@ -59,17 +60,17 @@ module RailsLineman
         system <<-BASH
           node_version=$(curl --silent --get https://semver.io/node/resolve)
           node_url="http://s3pository.heroku.com/node/v$node_version/node-v$node_version-linux-x64.tar.gz"
-          echo $node_url
           curl "$node_url" -s -o - | tar xzf - -C .
-          chmod +x node-v$node_version-linux-x64/bin/*
-          export PATH="$PATH:$(pwd)/node-v$node_version-linux-x64/bin"
-          echo $PATH
+          mv node-v$node_version-linux-x64 heroku_node_install
+          chmod +x heroku_node_install/bin/*
+          export PATH="$PATH:$(pwd)/heroku_node_install/bin"
         BASH
+        ENV['PATH'] += ":#{Dir.pwd}/heroku_node_install/bin"
       end
     end
 
     def heroku?
-      ENV['DYNO']
+      ENV['DYNO'] && ENV['STACK']
     end
 
     def run_npm_install
@@ -99,6 +100,10 @@ module RailsLineman
         Try again after installing lineman globally with `npm install -g lineman`
 
       ERROR
+    end
+
+    def delete_node_js_from_heroku
+      system "rm -rf heroku_node_install" if heroku?
     end
 
     def copy_javascripts
