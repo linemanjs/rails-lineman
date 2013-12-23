@@ -5,9 +5,12 @@ require 'rails_lineman/lineman_doer'
 namespace :assets do
   desc 'Compile all the assets named in config.assets.precompile (Wrapped by rails-lineman)'
   RailsLineman::TaskHelpers.override_task :precompile => :environment do
-    lineman_doer = RailsLineman::LinemanDoer.new(Rails.application.config.rails_lineman)
-    lineman_doer.build
-    Rake::Task["assets:precompile:original"].execute
-    lineman_doer.destroy
+    begin
+      lineman_doer = RailsLineman::LinemanDoer.new(Rails.application.config.rails_lineman)
+      lineman_doer.build
+      Rake::Task["assets:precompile:original"].execute
+    ensure
+      lineman_doer.destroy
+    end
   end
 end
