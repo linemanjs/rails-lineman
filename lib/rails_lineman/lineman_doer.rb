@@ -5,8 +5,11 @@ module RailsLineman
   class LinemanDoer
     def initialize(config)
       @lineman_project_location = config.lineman_project_location
+      @javascripts_source = File.join(@lineman_project_location, "dist", "js", ".")
       @javascripts_destination = Rails.root.join(config.javascripts_destination)
+      @stylesheets_source = File.join(@lineman_project_location, "dist", "css", ".")
       @stylesheets_destination = Rails.root.join(config.stylesheets_destination)
+      @tmp_dir = Rails.root.join(config.tmp_dir)
       @remove_lineman_assets_after_asset_pipeline_precompilation = config.remove_lineman_assets_after_asset_pipeline_precompilation
     end
 
@@ -18,6 +21,7 @@ module RailsLineman
         run_lineman_build
         delete_node_js_from_heroku
       end
+      ensure_directories_exist
       copy_javascripts
       add_javascripts_to_precompile_list
       copy_stylesheets
@@ -28,6 +32,7 @@ module RailsLineman
       return unless @remove_lineman_assets_after_asset_pipeline_precompilation
       delete_javascripts
       delete_stylesheets
+      delete_tmp_dir
     end
 
   private
@@ -106,8 +111,14 @@ module RailsLineman
       system "rm -rf heroku_node_install" if heroku?
     end
 
+    def ensure_directories_exist
+      ([@javascripts_source, @javascripts_destination, @stylesheets_source, @stylesheets_destination]).each do |path|
+        FileUtils.mkdir_p(path)
+      end
+    end
+
     def copy_javascripts
-      FileUtils.cp_r(File.join(@lineman_project_location, "dist", "js"), @javascripts_destination)
+      FileUtils.cp_r(@javascripts_source, @javascripts_destination)
     end
 
     def add_javascripts_to_precompile_list
@@ -115,7 +126,7 @@ module RailsLineman
     end
 
     def copy_stylesheets
-      FileUtils.cp_r(File.join(@lineman_project_location, "dist", "css"), @stylesheets_destination)
+      FileUtils.cp_r(@stylesheets_source, @stylesheets_destination)
     end
 
     def add_stylesheets_to_precompile_list
@@ -128,6 +139,10 @@ module RailsLineman
 
     def delete_stylesheets
       FileUtils.rm_rf(@stylesheets_destination)
+    end
+
+    def delete_tmp_dir
+      FileUtils.rm_rf(@tmp_dir)
     end
 
   end
