@@ -53,9 +53,8 @@ module RailsLineman
     end
 
     def gather_assets(config)
-      asset_descriptors = config.lineman_assets.split(",")
-      @assets = asset_descriptors.collect do |d|
-        Asset.new(config, d)
+      @assets = config.lineman_assets.collect do |d|
+        Asset.new(config, d.to_s)
       end
     end
 
