@@ -2,15 +2,60 @@ require 'pathname'
 require 'fileutils'
 
 module RailsLineman
+
+  class Asset
+    def initialize(config, descriptor)
+      @descriptor = descriptor.strip
+      @source = File.join(config.lineman_project_location, "dist", descriptor, ".")
+      @destination = destination
+    end
+
+    def destination
+      if is_precompilable?
+        Rails.root.join(File.join("tmp", "rails_lineman", "lineman"))
+      else
+        Rails.root.join(File.join("public", "assets", @descriptor))
+      end
+    end
+
+    def ensure_directories
+      [@source, @destination].each do |path|
+        FileUtils.mkdir_p(path)
+      end
+    end
+
+    def copy
+      FileUtils.cp_r(@source, @destination)
+    end
+
+    def add_if_precompilable
+      if(is_precompilable?)
+        Rails.application.config.assets.precompile +=
+          Dir.glob("#{@destination}/**/*.#{@descriptor}")
+      end
+    end
+
+    def is_precompilable?
+      ["js", "css"].member? @descriptor
+    end
+
+    def delete
+      FileUtils.rm_rf(@destination)
+    end
+  end
+
   class LinemanDoer
     def initialize(config)
+      gather_assets(config)
       @lineman_project_location = config.lineman_project_location
-      @javascripts_source = File.join(@lineman_project_location, "dist", "js", ".")
-      @javascripts_destination = Rails.root.join(config.javascripts_destination)
-      @stylesheets_source = File.join(@lineman_project_location, "dist", "css", ".")
-      @stylesheets_destination = Rails.root.join(config.stylesheets_destination)
       @tmp_dir = Rails.root.join(config.tmp_dir)
       @remove_lineman_assets_after_asset_pipeline_precompilation = config.remove_lineman_assets_after_asset_pipeline_precompilation
+    end
+
+    def gather_assets(config)
+      @assets = config.lineman_assets.collect do |d|
+        Asset.new(config, d.to_s)
+      end
     end
 
     def build
@@ -22,16 +67,13 @@ module RailsLineman
         delete_node_js_from_heroku
       end
       ensure_directories_exist
-      copy_javascripts
-      add_javascripts_to_precompile_list
-      copy_stylesheets
-      add_stylesheets_to_precompile_list
+      copy
+      add_to_precompile_list
     end
 
     def destroy
       return unless @remove_lineman_assets_after_asset_pipeline_precompilation
-      delete_javascripts
-      delete_stylesheets
+      delete
       delete_tmp_dir
     end
 
@@ -112,33 +154,19 @@ module RailsLineman
     end
 
     def ensure_directories_exist
-      ([@javascripts_source, @javascripts_destination, @stylesheets_source, @stylesheets_destination]).each do |path|
-        FileUtils.mkdir_p(path)
-      end
+      @assets.map(&:ensure_directories)
     end
 
-    def copy_javascripts
-      FileUtils.cp_r(@javascripts_source, @javascripts_destination)
+    def copy
+      @assets.map(&:copy)
     end
 
-    def add_javascripts_to_precompile_list
-      Rails.application.config.assets.precompile += Dir.glob("#{@javascripts_destination}/**/*.js")
+    def add_to_precompile_list
+      @assets.map(&:add_if_precompilable)
     end
 
-    def copy_stylesheets
-      FileUtils.cp_r(@stylesheets_source, @stylesheets_destination)
-    end
-
-    def add_stylesheets_to_precompile_list
-      Rails.application.config.assets.precompile += Dir.glob("#{@stylesheets_destination}/**/*.css")
-    end
-
-    def delete_javascripts
-      FileUtils.rm_rf(@javascripts_destination)
-    end
-
-    def delete_stylesheets
-      FileUtils.rm_rf(@stylesheets_destination)
+    def delete
+      @assets.map(&:delete)
     end
 
     def delete_tmp_dir
