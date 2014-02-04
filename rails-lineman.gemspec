@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["searls@gmail.com"]
   spec.description   = %q{Helps Rails apps integrate a Lineman into their build by wrapping rake assets:precompile}
   spec.summary       = %q{Helps Rails apps integrate a Lineman into their build by wrapping rake assets:precompile.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/linemanjs/rails-lineman"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
