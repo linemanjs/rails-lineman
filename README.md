@@ -5,9 +5,43 @@ assets.
 
 Wraps the `assets:precompile` rake task by building a specified lineman project.
 
-All you need to set is a config property `Rails.application.config.rails_lineman.lineman_project_location` or environment variable $LINEMAN_PROJECT_LOCATION.
+## Pointing at your lineman project
 
-You may specify exactly what dist directories you want included through `Rails.application.config.rails_lineman.lineman_assets` or environment variable $LINEMAN_ASSETS.  Javascript and CSS are preprocessed, while any other folders- for example, img, are simply included in assets untouched.  Multiple folders are expressed as an array of Strings or Symbols.
+In `config/application.rb`, tell the gem where to find your Lineman project:
+
+```
+config.rails_lineman.lineman_project_location = "some-directory"
+```
+
+You can also set an environment variable named `LINEMAN_PROJECT_LOCATION`
+
+## Specifying asset types
+
+By default, rails-lineman will only copy `dist/js` and `dist/css` from your Lineman
+build to your Rails assets. To include other assets, like `dist/webfonts`, just add
+them like so:
+
+```
+config.rails_lineman.lineman_assets = [:webfonts, :css, :js]
+```
+
+You can also set an environment variable named `LINEMAN_ASSETS`
+
+**Heads up:** if you add additional asset directories like above, you'll want to set up
+the same directories as static routes for Lineman's development server. For example,
+in your `config/application.js` file:
+
+```
+//...
+  server: {
+    staticRoutes: {
+      '/assets/fonts': 'fonts'
+    }
+  }
+//...
+```
+
+## Referencing Lineman assets from your Rails views
 
 From your templates you'll be able to require lineman-built JS & CSS like so:
 
