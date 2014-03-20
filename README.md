@@ -35,7 +35,7 @@ in your `config/application.js` file:
 //...
   server: {
     staticRoutes: {
-      '/assets/fonts': 'fonts'
+      '/assets/webfonts': 'webfonts'
     }
   }
 //...
