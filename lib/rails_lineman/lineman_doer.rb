@@ -72,8 +72,7 @@ module RailsLineman
     end
 
     def destroy
-      return unless @remove_lineman_assets_after_asset_pipeline_precompilation
-      delete
+      delete_some_assets_for_whatever_reason if @remove_lineman_assets_after_asset_pipeline_precompilation
       delete_tmp_dir
     end
 
@@ -165,7 +164,7 @@ module RailsLineman
       @assets.map(&:add_if_precompilable)
     end
 
-    def delete
+    def delete_some_assets_for_whatever_reason
       @assets.map(&:delete)
     end
 
