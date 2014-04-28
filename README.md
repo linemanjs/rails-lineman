@@ -50,3 +50,18 @@ From your templates you'll be able to require lineman-built JS & CSS like so:
 <%= javascript_include_tag "lineman/app" %>
 ```
 
+## Build environments that don't support node.js
+
+Sometimes your existing deployment environment will support Ruby (because your
+  app runs there), but will lack a proper Node.js runtime environment. In those
+  cases, you may desire to cook up your own way to push the `dist` directory from
+  your lineman application to your deployment server such that when *it* runs
+  `rake assets:precompile` that the lineman assets will be in the proper place
+  and copied at the appropriate moment despite not having been built on the actual
+  server.
+
+In cases like these, you may set:
+
+```
+config.rails_lineman.skip_build = true
+```

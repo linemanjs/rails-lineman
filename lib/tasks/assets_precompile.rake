@@ -7,10 +7,10 @@ namespace :assets do
   RailsLineman::TaskHelpers.override_task :precompile => :environment do
     begin
       lineman_doer = RailsLineman::LinemanDoer.new(Rails.application.config.rails_lineman)
-      lineman_doer.build
+      lineman_doer.precompile_assets
       Rake::Task["assets:precompile:original"].execute
     ensure
-      lineman_doer.destroy
+      lineman_doer.destroy_assets
     end
   end
 end

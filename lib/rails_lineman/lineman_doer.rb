@@ -1,56 +1,31 @@
 require 'pathname'
 require 'fileutils'
+require 'rails_lineman/asset'
 
 module RailsLineman
-
-  class Asset
-    def initialize(config, descriptor)
-      @descriptor = descriptor.strip
-      @source = File.join(config.lineman_project_location, "dist", descriptor, ".")
-      @destination = destination
-    end
-
-    def destination
-      if is_precompilable?
-        Rails.root.join(File.join("tmp", "rails_lineman", "lineman"))
-      else
-        Rails.root.join(File.join("public", "assets", @descriptor))
-      end
-    end
-
-    def ensure_directories
-      [@source, @destination].each do |path|
-        FileUtils.mkdir_p(path)
-      end
-    end
-
-    def copy
-      FileUtils.cp_r(@source, @destination)
-    end
-
-    def add_if_precompilable
-      if(is_precompilable?)
-        Rails.application.config.assets.precompile +=
-          Dir.glob("#{@destination}/**/*.#{@descriptor}")
-      end
-    end
-
-    def is_precompilable?
-      ["js", "css"].member? @descriptor
-    end
-
-    def delete
-      FileUtils.rm_rf(@destination)
-    end
-  end
-
   class LinemanDoer
     def initialize(config)
       gather_assets(config)
       @lineman_project_location = config.lineman_project_location
+      @skip_build = config.skip_build
       @tmp_dir = Rails.root.join(config.tmp_dir)
       @remove_lineman_assets_after_asset_pipeline_precompilation = config.remove_lineman_assets_after_asset_pipeline_precompilation
     end
+
+    def precompile_assets
+      absolutify_lineman_path
+      perform_lineman_build unless @skip_build
+      ensure_directories_exist
+      copy
+      add_to_precompile_list
+    end
+
+    def destroy_assets
+      delete_some_assets_for_whatever_reason if @remove_lineman_assets_after_asset_pipeline_precompilation
+      delete_tmp_dir
+    end
+
+  private
 
     def gather_assets(config)
       @assets = config.lineman_assets.collect do |d|
@@ -58,25 +33,14 @@ module RailsLineman
       end
     end
 
-    def build
-      absolutify_lineman_path
+    def perform_lineman_build
       chdir @lineman_project_location do
         install_node_js_on_heroku
         run_npm_install
         run_lineman_build
         delete_node_js_from_heroku
       end
-      ensure_directories_exist
-      copy
-      add_to_precompile_list
     end
-
-    def destroy
-      delete_some_assets_for_whatever_reason if @remove_lineman_assets_after_asset_pipeline_precompilation
-      delete_tmp_dir
-    end
-
-  private
 
     def absolutify_lineman_path
       @lineman_project_location = Pathname.new(@lineman_project_location).realpath.to_s
