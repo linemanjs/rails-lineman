@@ -35,7 +35,7 @@ config.rails_lineman.lineman_project_location = {
 }
 ```
 
-A hash configuration will result in your lineman assets being namespaced under "lineman/<app-name>", as opposed to at the root "lineman/" like they usually are.
+A hash configuration will result in your lineman assets being namespaced under "lineman/<app-name>", as opposed to at the root "lineman/" like they usually are. Keep this in mind when referencing your assets (e.g. you would need in this example to reference the second app's CSS as `<%= stylesheet_link_tag "lineman/admin-ui/app" %>`)
 
 ## Specifying asset types
 
