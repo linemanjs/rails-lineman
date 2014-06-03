@@ -1,6 +1,6 @@
 require 'rails_lineman/task_helpers'
 
-require 'rails_lineman/lineman_doer'
+require 'rails_lineman/meta_lineman_doer'
 
 namespace :assets do
   desc 'Compile all the assets named in config.assets.precompile (Wrapped by rails-lineman)'
