@@ -13,7 +13,7 @@ module RailsLineman
       load(File.join(File.dirname(__FILE__), '..', 'tasks', 'assets_precompile.rake'))
     end
 
-    initializer "rails_jasmine.add_asset_paths" do
+    initializer "rails_lineman.add_asset_paths" do
       Rails.application.config.assets.paths |= config.rails_lineman.asset_paths.map { |path| Rails.root.join(path) }
     end
   end
