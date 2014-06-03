@@ -25,14 +25,12 @@ module RailsLineman
     end
 
     def add_if_precompilable
-      if(is_precompilable?)
-        Rails.application.config.assets.precompile +=
-          Dir.glob("#{@destination}/**/*.#{@descriptor}")
-      end
+      return unless is_precompilable?
+      Rails.application.config.assets.precompile += Dir.glob("#{@destination}/**/*.#{@descriptor}")
     end
 
     def is_precompilable?
-      ["js", "css"].member? @descriptor
+      ["js", "css"].include?(@descriptor)
     end
 
     def delete
