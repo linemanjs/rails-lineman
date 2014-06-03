@@ -15,6 +15,28 @@ config.rails_lineman.lineman_project_location = "some-directory"
 
 You can also set an environment variable named `LINEMAN_PROJECT_LOCATION`
 
+### Pointing at multiple lineman projects
+
+If you want to include multiple lineman projects, then you can provide a hash of logical names mapping to their path location.
+
+```
+config.rails_lineman.lineman_project_location = {
+  "my-app" => "app1",
+  "admin-ui" => "app2"
+}
+```
+
+The `LINEMAN_PROJECT_LOCATION` env variable will be ignored in this case, but you can of course bring your own like so:
+
+```
+config.rails_lineman.lineman_project_location = {
+  "my-app" => ENV['APP1_PATH'],
+  "admin-ui" => ENV['APP2_PATH']
+}
+```
+
+A hash configuration will result in your lineman assets being namespaced under "lineman/<app-name>", as opposed to at the root "lineman/" like they usually are. Keep this in mind when referencing your assets (e.g. you would need in this example to reference the second app's CSS as `<%= stylesheet_link_tag "lineman/admin-ui/app" %>`)
+
 ## Specifying asset types
 
 By default, rails-lineman will only copy `dist/js` and `dist/css` from your Lineman

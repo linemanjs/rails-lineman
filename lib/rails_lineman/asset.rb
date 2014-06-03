@@ -3,15 +3,7 @@ module RailsLineman
     def initialize(config, descriptor)
       @descriptor = descriptor.strip
       @source = File.join(config.lineman_project_location, "dist", descriptor, ".")
-      @destination = destination
-    end
-
-    def destination
-      if is_precompilable?
-        Rails.root.join(File.join("tmp", "rails_lineman", "lineman"))
-      else
-        Rails.root.join(File.join("public", "assets", @descriptor))
-      end
+      @destination = determine_destination(config.lineman_project_namespace)
     end
 
     def ensure_directories
@@ -20,23 +12,31 @@ module RailsLineman
       end
     end
 
+    def add_if_precompilable
+      return unless is_precompilable?
+      Rails.application.config.assets.precompile += Dir.glob("#{@destination}/**/*.#{@descriptor}")
+    end
+
     def copy
       FileUtils.cp_r(@source, @destination)
     end
 
-    def add_if_precompilable
-      if(is_precompilable?)
-        Rails.application.config.assets.precompile +=
-          Dir.glob("#{@destination}/**/*.#{@descriptor}")
+    def delete
+      FileUtils.rm_rf(@destination)
+    end
+
+  private
+
+    def determine_destination(namespace)
+      if is_precompilable?
+        Rails.root.join(File.join(*["tmp", "rails_lineman", "lineman", namespace].compact))
+      else
+        Rails.root.join(File.join(*["public", "assets", namespace, @descriptor].compact))
       end
     end
 
     def is_precompilable?
-      ["js", "css"].member? @descriptor
-    end
-
-    def delete
-      FileUtils.rm_rf(@destination)
+      ["js", "css"].include?(@descriptor)
     end
   end
 end

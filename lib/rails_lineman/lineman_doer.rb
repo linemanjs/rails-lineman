@@ -65,18 +65,17 @@ module RailsLineman
     end
 
     def install_node_js_on_heroku
-      if heroku?
-        puts "It looks like we're on heroku, so let's install Node.js"
-        system <<-BASH
-          node_version=$(curl --silent --get https://semver.io/node/resolve)
-          node_url="http://s3pository.heroku.com/node/v$node_version/node-v$node_version-linux-x64.tar.gz"
-          curl "$node_url" -s -o - | tar xzf - -C .
-          mv node-v$node_version-linux-x64 heroku_node_install
-          chmod +x heroku_node_install/bin/*
-          export PATH="$PATH:$(pwd)/heroku_node_install/bin"
-        BASH
-        ENV['PATH'] += ":#{Dir.pwd}/heroku_node_install/bin"
-      end
+      return unless heroku? && !ENV['PATH'].include?("#{Dir.pwd}/heroku_node_install/bin")
+      puts "It looks like we're on heroku, so let's install Node.js"
+      system <<-BASH
+        node_version=$(curl --silent --get https://semver.io/node/resolve)
+        node_url="http://s3pository.heroku.com/node/v$node_version/node-v$node_version-linux-x64.tar.gz"
+        curl "$node_url" -s -o - | tar xzf - -C .
+        mv node-v$node_version-linux-x64 heroku_node_install
+        chmod +x heroku_node_install/bin/*
+        export PATH="$PATH:$(pwd)/heroku_node_install/bin"
+      BASH
+      ENV['PATH'] += ":#{Dir.pwd}/heroku_node_install/bin"
     end
 
     def heroku?
