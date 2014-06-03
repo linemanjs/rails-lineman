@@ -10,7 +10,7 @@ namespace :assets do
       lineman_doer.precompile_assets
       Rake::Task["assets:precompile:original"].execute
     ensure
-      lineman_doer.destroy_assets
+      lineman_doer.try(:destroy_assets)
     end
   end
 end
