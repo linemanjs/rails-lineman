@@ -35,6 +35,8 @@ config.rails_lineman.lineman_project_location = {
 }
 ```
 
+A hash configuration will result in your lineman assets being namespaced under "lineman/<app-name>", as opposed to at the root "lineman/" like they usually are.
+
 ## Specifying asset types
 
 By default, rails-lineman will only copy `dist/js` and `dist/css` from your Lineman
