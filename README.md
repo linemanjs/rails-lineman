@@ -15,6 +15,26 @@ config.rails_lineman.lineman_project_location = "some-directory"
 
 You can also set an environment variable named `LINEMAN_PROJECT_LOCATION`
 
+### Pointing at multiple lineman projects
+
+If you want to include multiple lineman projects, then you can provide a hash of logical names mapping to their path location.
+
+```
+config.rails_lineman.lineman_project_location = {
+  "my-app" => "app1",
+  "admin-ui" => "app2"
+}
+```
+
+The `LINEMAN_PROJECT_LOCATION` env variable will be ignored in this case, but you can of course bring your own like so:
+
+```
+config.rails_lineman.lineman_project_location = {
+  "my-app" => ENV['APP1_PATH'],
+  "admin-ui" => ENV['APP2_PATH']
+}
+```
+
 ## Specifying asset types
 
 By default, rails-lineman will only copy `dist/js` and `dist/css` from your Lineman
