@@ -22,11 +22,24 @@ module RailsLineman
     end
 
     initializer "rails_lineman.add_asset_paths" do
-      if(config.rails_lineman.deployment_method == :copy_files_to_public_folder)
-        # `rake deploy:frontend`
-      elsif(config.rails_lineman.deployment_method == :assets)
-        Rails.application.config.assets.paths |= config.rails_lineman.asset_paths.map { |path| Rails.root.join(path) } 
+      if(config.rails_lineman.deployment_method == :assets)
+        Rails.application.config.assets.paths |= config.rails_lineman.asset_paths.map { |path| Rails.root.join(path) }
       end
+    end
+
+    config.before_initialize do
+      require 'rails_lineman/meta_lineman_doer'
+
+      if(config.rails_lineman.deployment_method == :copy_files_to_public_folder && Rails.env == 'production')
+        config = Rails.application.config.rails_lineman
+        if config.lineman_project_location.present?
+          lineman_doer = RailsLineman::MetaLinemanDoer.new(config)
+          lineman_doer.copy_files
+        else
+          puts "WARNING: No Lineman project location was set (see: `config.rails_lineman.lineman_project_location`). Skipping Lineman build"
+        end
+      end
+
     end
 
   end

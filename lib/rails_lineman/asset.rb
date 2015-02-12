@@ -29,10 +29,10 @@ module RailsLineman
 
     def determine_destination(config)
       namespace = config.lineman_project_namespace
-      if is_precompilable?
+      if is_precompilable?(config)
         Rails.root.join(File.join(*["tmp", "rails_lineman", "lineman", namespace].compact))
       else
-        if config.rails_lineman.deployment_method == :copy_files_to_public_folder
+        if config.deployment_method == :copy_files_to_public_folder
           Rails.root.join(File.join(*["public", namespace, @descriptor].compact))
         else
           Rails.root.join(File.join(*["public", "assets", namespace, @descriptor].compact))
@@ -40,7 +40,7 @@ module RailsLineman
       end
     end
 
-    def is_precompilable?
+    def is_precompilable?(config)
       ["js", "css"].include?(@descriptor) && config.deployment_method == :assets
     end
   end
