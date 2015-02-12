@@ -26,7 +26,7 @@ module RailsLineman
       absolutify_lineman_path
       perform_lineman_build unless @skip_build
       ensure_directories_exist
-      copy
+      copy_assets_and_pages
     end
 
     def destroy_assets
@@ -135,6 +135,10 @@ module RailsLineman
     end
 
     def copy
+      @assets.map(&:copy)
+    end
+
+    def copy_assets_and_pages
       @assets.map(&:copy)
       @pages.map(&:copy)
     end
