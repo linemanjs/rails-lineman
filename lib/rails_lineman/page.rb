@@ -1,9 +1,9 @@
 module RailsLineman
   class Page
     def initialize(config, descriptor)
-       puts @descriptor = descriptor.strip
-      puts @source = File.join(config.lineman_project_location, "dist", descriptor, ".")
-      puts @destination = determine_destination(config)
+      @descriptor = "#{descriptor.strip}.html"
+      @source = File.join(config.lineman_project_location, "dist", @descriptor)
+      @destination = determine_destination(config)
     end
 
     def ensure_directories
@@ -13,7 +13,7 @@ module RailsLineman
     end
 
     def copy
-      FileUtils.cp_r(@source, @destination)
+      FileUtils.cp(@source, @destination)
     end
 
     def delete

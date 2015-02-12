@@ -1,11 +1,13 @@
 require 'pathname'
 require 'fileutils'
 require 'rails_lineman/asset'
+require 'rails_lineman/page'
 
 module RailsLineman
   class LinemanDoer
     def initialize(config)
       gather_assets(config)
+      gather_pages(config)
       @lineman_project_location = config.lineman_project_location
       @skip_build = config.skip_build
       @tmp_dir = Rails.root.join(config.tmp_dir)
@@ -37,6 +39,12 @@ module RailsLineman
     def gather_assets(config)
       @assets = config.lineman_assets.collect do |d|
         Asset.new(config, d.to_s)
+      end
+    end
+
+     def gather_pages(config)
+      @pages = config.lineman_pages.collect do |d|
+        Page.new(config, d.to_s)
       end
     end
 
@@ -128,6 +136,7 @@ module RailsLineman
 
     def copy
       @assets.map(&:copy)
+      @pages.map(&:copy)
     end
 
     def add_to_precompile_list
