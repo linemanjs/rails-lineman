@@ -32,7 +32,7 @@ module RailsLineman
         config = Rails.application.config.rails_lineman
 
       if(config.deployment_method == :copy_files_to_public_folder && Rails.env == 'production' && !config.skip_build)
-        if config.lineman_project_location.present?
+        if config.lineman_project_location.present? && !Dir[Rails.root.join('public/*')].include?(Rails.root.join('public/index.html').to_s)
           lineman_doer = RailsLineman::MetaLinemanDoer.new(config)
           lineman_doer.copy_files
         else
