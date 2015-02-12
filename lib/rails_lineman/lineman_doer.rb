@@ -6,8 +6,8 @@ require 'rails_lineman/page'
 module RailsLineman
   class LinemanDoer
     def initialize(config)
-      gather_assets(config) if config.deployment_method == :copy_files_to_public_folder
-      gather_pages(config)
+      gather_assets(config)
+      gather_pages(config) if config.deployment_method == :copy_files_to_public_folder
       @lineman_project_location = config.lineman_project_location
       @skip_build = config.skip_build
       @tmp_dir = Rails.root.join(config.tmp_dir)
