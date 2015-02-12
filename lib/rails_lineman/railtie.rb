@@ -29,14 +29,16 @@ module RailsLineman
 
     config.before_initialize do
       require 'rails_lineman/meta_lineman_doer'
-        config = Rails.application.config.rails_lineman
+      config = Rails.application.config.rails_lineman
 
       if(config.deployment_method == :copy_files_to_public_folder && Rails.env == 'production' && !config.skip_build)
-        if config.lineman_project_location.present? && !Dir[Rails.root.join('public/*')].include?(Rails.root.join('public/index.html').to_s)
-          lineman_doer = RailsLineman::MetaLinemanDoer.new(config)
-          lineman_doer.copy_files
-        else
-          puts "WARNING: No Lineman project location was set (see: `config.rails_lineman.lineman_project_location`). Skipping Lineman build"
+        if !Dir[Rails.root.join('public/*')].include?(Rails.root.join('public/index.html').to_s)
+          if config.lineman_project_location.present?
+            lineman_doer = RailsLineman::MetaLinemanDoer.new(config)
+            lineman_doer.copy_files
+          else
+            puts "WARNING: No Lineman project location was set (see: `config.rails_lineman.lineman_project_location`). Skipping Lineman build"
+          end
         end
       end
 
