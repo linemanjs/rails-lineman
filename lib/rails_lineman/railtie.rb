@@ -22,12 +22,12 @@ module RailsLineman
     end
 
     initializer "rails_lineman.add_asset_paths" do
-      Rails.application.config.assets.paths |= config.rails_lineman.asset_paths.map { |path| Rails.root.join(path) } if(config.rails_lineman.deployment_method == :assets)
-      # `rake deploy:frontend` if config.rails_lineman.copy_files_to_public_folder
+      if(config.rails_lineman.deployment_method == :copy_files_to_public_folder)
+        # `rake deploy:frontend`
+      elsif(config.rails_lineman.deployment_method == :assets)
+        Rails.application.config.assets.paths |= config.rails_lineman.asset_paths.map { |path| Rails.root.join(path) } 
+      end
     end
 
-    # initializer "rails_lineman.add_frontend" do
-    #   # Rails.application.config.assets.paths |= config.rails_lineman.asset_paths.map { |path| Rails.root.join(path) }
-    # end
   end
 end
