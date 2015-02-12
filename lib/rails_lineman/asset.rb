@@ -31,7 +31,11 @@ module RailsLineman
       if is_precompilable?
         Rails.root.join(File.join(*["tmp", "rails_lineman", "lineman", namespace].compact))
       else
-        Rails.root.join(File.join(*["public", "assets", namespace, @descriptor].compact))
+        if config.rails_lineman.copy_files_to_public_folder
+          Rails.root.join(File.join(*["public", namespace, @descriptor].compact))
+        else
+          Rails.root.join(File.join(*["public", "assets", namespace, @descriptor].compact))
+      end
       end
     end
 

@@ -6,11 +6,11 @@ require 'rails_lineman/version'
 Gem::Specification.new do |spec|
   spec.name          = "rails-lineman"
   spec.version       = RailsLineman::VERSION
-  spec.authors       = ["Justin Searls"]
-  spec.email         = ["searls@gmail.com"]
-  spec.description   = %q{Helps Rails apps integrate a Lineman into their build by wrapping rake assets:precompile}
-  spec.summary       = %q{Helps Rails apps integrate a Lineman into their build by wrapping rake assets:precompile.}
-  spec.homepage      = "https://github.com/linemanjs/rails-lineman"
+  spec.authors       = ["Justin Searls", "Diego F. Gomez"]
+  spec.email         = ["searls@gmail.com", "diego.f.gomez.pardo@gmail.com"]
+  spec.description   = %q{Helps Rails apps integrate a Lineman into their build by copy the frontend dist files into the public folder.}
+  spec.summary       = %q{Helps Rails apps integrate a Lineman into their build by copy the frontend dist files into the public folder.}
+  spec.homepage      = "https://github.com/degzcs/rails-lineman"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)

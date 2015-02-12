@@ -20,6 +20,13 @@ module RailsLineman
       add_to_precompile_list
     end
 
+    def copy_files
+      absolutify_lineman_path
+      perform_lineman_build unless @skip_build
+      ensure_directories_exist
+      copy
+    end
+
     def destroy_assets
       delete_some_assets_for_whatever_reason if @remove_lineman_assets_after_asset_pipeline_precompilation
       delete_tmp_dir
