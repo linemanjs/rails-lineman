@@ -24,7 +24,7 @@ module RailsLineman
 
     def copy_files
       absolutify_lineman_path
-      perform_lineman_build unless @skip_build
+      perform_lineman_build
       ensure_directories_exist
       copy_assets_and_pages
     end
