@@ -1,9 +1,10 @@
 module RailsLineman
   class Asset
     def initialize(config, descriptor)
+      @config = config
       @descriptor = descriptor.strip
       @source = File.join(config.lineman_project_location, "dist", descriptor, ".")
-      @destination = determine_destination(config.lineman_project_namespace)
+      @destination = determine_destination
     end
 
     def ensure_directories
@@ -27,16 +28,21 @@ module RailsLineman
 
   private
 
-    def determine_destination(namespace)
+    def determine_destination
+      namespace=@config.lineman_project_namespace
       if is_precompilable?
         Rails.root.join(File.join(*["tmp", "rails_lineman", "lineman", namespace].compact))
       else
-        Rails.root.join(File.join(*["public", "assets", namespace, @descriptor].compact))
+        if @config.deployment_method == :copy_files_to_public_folder
+          Rails.root.join(File.join(*["public", namespace, @descriptor].compact))
+        else
+          Rails.root.join(File.join(*["public", "assets", namespace, @descriptor].compact))
+        end
       end
     end
 
     def is_precompilable?
-      ["js", "css"].include?(@descriptor)
+      ["js", "css"].include?(@descriptor) && @config.deployment_method == :asset_pipeline
     end
   end
 end

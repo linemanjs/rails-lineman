@@ -10,6 +10,10 @@ module RailsLineman
       @lineman_doers.map(&:precompile_assets)
     end
 
+    def copy_files
+      @lineman_doers.map(&:copy_files)
+    end
+
     def destroy_assets
       @lineman_doers.map(&:destroy_assets)
     end
