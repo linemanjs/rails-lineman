@@ -42,7 +42,7 @@ module RailsLineman
     end
 
     def is_precompilable?
-      ["js", "css"].include?(@descriptor) && @config.deployment_method == :assets
+      ["js", "css"].include?(@descriptor) && @config.deployment_method == :asset_pipeline
     end
   end
 end
